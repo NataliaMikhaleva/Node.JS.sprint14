@@ -31,26 +31,34 @@ module.exports.getUserId = ((req, res) => {
 });
 
 module.exports.createUser = ((req, res) => {
-  // const {
-  //   email, password, name, about, avatar,
-  // } = req.body;
-  bcrypt.hash(req.body.password, 10)
-
-    .then((hash) => {
-      User.create({
-        email: req.body.email,
-        password: hash,
-        name: req.body.name,
-        about: req.body.about,
-        avatar: req.body.avatar,
-      })
-
-        .then((user) => {
-          res.send({ data: user });
-        });
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
+  if (password.length < 8 || /\s/.test(password)) {
+    return res.status(400).send({ message: 'Пароль не прошел валидацию' });
+  }
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    }))
+    .then((user) => {
+      res.send({
+        data: {
+          _id: user._id,
+          email: user.email,
+        },
+      });
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Невалидные данные' });
+    .catch((err) => {
+      if (err.code === 11000) {
+        res.status(409).send({ message: 'Такой пользователь уже существует' });
+        return;
+      }
+      res.status(404).send({ message: 'Невалидные данные' });
     });
 });
 

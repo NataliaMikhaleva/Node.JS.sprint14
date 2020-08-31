@@ -18,13 +18,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 const { PORT = 3000, BASE_PATH } = process.env;
 app.use(express.static((path.join(__dirname, 'public'))));
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '5f37b10b737bf835d4ce1953',
-//   };
 
-//   next();
-// });
 app.post('/signin', login);
 app.post('/signup', createUser);
 app.use('/users', auth, users);
