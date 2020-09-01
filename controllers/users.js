@@ -34,6 +34,9 @@ module.exports.createUser = ((req, res) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
+  if (typeof password === 'undefined') {
+    return res.status(400).send({ message: 'Пароль не передан' });
+  }
   if (password.length < 8 || /\s/.test(password)) {
     return res.status(400).send({ message: 'Пароль не прошел валидацию' });
   }
